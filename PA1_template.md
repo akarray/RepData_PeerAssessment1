@@ -1,16 +1,12 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 Load provided the data.
 
-```{r}
+
+```r
 unzip("activity.zip")
 
 activity <- read.csv(file = './activity.csv',  
@@ -23,7 +19,8 @@ activity <- read.csv(file = './activity.csv',
 
 Process/transform the data
 
-```{r}
+
+```r
 activity$date <- as.Date(activity$date)
 ```
 
@@ -31,7 +28,8 @@ activity$date <- as.Date(activity$date)
 
 Calculate the total number of steps taken per day
 
-```{r}
+
+```r
 dailyActivity <-
   aggregate(formula = steps~date, data = activity,
             FUN = sum, na.rm=TRUE)
@@ -40,16 +38,20 @@ dailyActivity <-
 
 histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 library(ggplot2)
 histogram <- qplot(x=steps, data=dailyActivity) +
   labs(y='Total steps each day', x='Number of steps')
 plot(histogram)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 Calculate and report the mean and median of the total number of steps taken per day
 
-```{r}
+
+```r
 meanSteps <- round(mean(dailyActivity$steps), 2)  # Mean
 medianSteps <- quantile(x = dailyActivity$steps, probs = 0.5)  # Median
 ```
@@ -58,13 +60,15 @@ medianSteps <- quantile(x = dailyActivity$steps, probs = 0.5)  # Median
 
 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
+
+```r
 intervalActivity <- aggregate(formula = steps~interval, data = activity, FUN = mean, na.rm=TRUE)
 ```
 
 Plot the average number of steps per interval.
 
-```{r}
+
+```r
 myPlot <- ggplot(
         intervalActivity,
         aes(intervalActivity$interval, intervalActivity$steps),)
@@ -75,10 +79,13 @@ myPlot +
     ylab("Avg Num Steps Taken")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+
 
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 maxSteps <- intervalActivity[intervalActivity$steps==max(intervalActivity$steps),]
 ```
 
@@ -87,9 +94,14 @@ maxSteps <- intervalActivity[intervalActivity$steps==max(intervalActivity$steps)
 
 Total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-```{r}
+
+```r
 totalNAs <- sum(is.na(activity))
 totalNAs
+```
+
+```
+## [1] 2304
 ```
 
 Devise a strategy for filling in all of the missing values in the dataset.
@@ -98,7 +110,8 @@ The averaged steps per interval (over all days) will be used to replace the miss
 
 Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r}
+
+```r
 # replace missing values with the averaged steps per interval
 activityCompleted <- activity
 for(r in 1:nrow(activityCompleted)){
@@ -111,9 +124,14 @@ for(r in 1:nrow(activityCompleted)){
 sum(is.na(activityCompleted$steps))
 ```
 
+```
+## [1] 0
+```
+
 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
-```{r}
+
+```r
 dailyActivityCompleted <-
   aggregate(formula = steps~date, data = activityCompleted,
             FUN = sum, na.rm=TRUE)
@@ -121,19 +139,32 @@ dailyActivityCompleted <-
 
 Histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 library(ggplot2)
 histogram <- qplot(x=steps, data=dailyActivityCompleted) +
   labs(y='Total steps each day', x='Number of steps')
 plot(histogram)
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
+
+```r
 mean(dailyActivityCompleted$steps, na.rm=TRUE)
 ```
 
-```{r}
+```
+## [1] 10766.19
+```
+
+
+```r
 median(dailyActivityCompleted$steps, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 
@@ -151,16 +182,24 @@ The total daily number of steps increases as a result of added value.
 Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 
 
-```{r}
+
+```r
 activityCompleted$day <- "weekday"
 activityCompleted$day[weekdays(as.Date(activityCompleted$date)) %in% c("samedi","dimanche")] <- "weekend"
-
 ```
-```{r}
+
+```r
 table(activityCompleted$day)
 ```
 
+```
+## 
+## weekday weekend 
+##   12960    4608
+```
+
 Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
 
 
 myPlot <- ggplot(
@@ -173,12 +212,22 @@ myPlot +
     ylab("Avg Num Steps Taken")
 
 
-```{r}
+
+```r
 library(scales)
 
 ggplot(activityCompleted, aes(date, steps)) +
     geom_line(color="blue") +
     xlab("Daily 5 minute Intervals") +
     ylab("Average Number of Steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
+
+```r
     facet_grid(. ~ day)
+```
+
+```
+## facet_grid( ~ day)
 ```
