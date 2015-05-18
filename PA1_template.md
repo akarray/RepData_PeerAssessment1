@@ -186,6 +186,9 @@ Create a new factor variable in the dataset with two levels – “weekday” an
 ```r
 activityCompleted$day <- "weekday"
 activityCompleted$day[weekdays(as.Date(activityCompleted$date)) %in% c("samedi","dimanche")] <- "weekend"
+activityCompleted$day <- as.factor(activityCompleted$day)
+
+intervalActivityComplete <- aggregate(formula = steps~interval + day, data = activityCompleted, FUN = mean, na.rm=TRUE)
 ```
 
 ```r
@@ -202,32 +205,16 @@ Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minut
 
 
 
-myPlot <- ggplot(
-        intervalActivity,
-        aes(intervalActivity$interval, intervalActivity$steps),)
-myPlot + 
-    geom_line(colour="red") + 
-    ggtitle("Time Series Plot of the 5m Interval and the avg No. Steps Taken") +
-    xlab("Intervals") +
-    ylab("Avg Num Steps Taken")
 
 
 
 ```r
 library(scales)
 
-ggplot(activityCompleted, aes(date, steps)) +
-    geom_line(color="blue") +
-    xlab("Daily 5 minute Intervals") +
-    ylab("Average Number of Steps")
+p <- ggplot(intervalActivityComplete, aes(interval, steps)) +
+    geom_line(color="red") +
+    xlab("Avg Num Steps Taken") 
+p + facet_grid(. ~ day)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-17-1.png) 
-
-```r
-    facet_grid(. ~ day)
-```
-
-```
-## facet_grid( ~ day)
-```
